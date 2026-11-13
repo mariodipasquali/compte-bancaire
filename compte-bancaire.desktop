@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Compte bancaire
+GenericName=Tenue de compte bancaire
+Comment=Lance la tenue de compte bancaire et ouvre le navigateur
+Exec=bash -c "python3 $HOME/pCloudDrive/compte_bancaire/compte_bancaire.py"
+Icon=text-x-python
+Terminal=true
+Categories=Office;Finance;
+Keywords=compte;banque;dépenses;transactions;
+StartupNotify=true
