@@ -490,8 +490,8 @@ h2{margin:0 0 14px;font-size:1.05rem;font-weight:700;color:var(--texte);display:
 h2::before{content:"";width:4px;height:18px;border-radius:2px;background:linear-gradient(180deg,var(--bleu),#818cf8);flex:none}
 form{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
 label{display:flex;flex-direction:column;font-size:.74rem;color:var(--texte2);font-weight:600;gap:5px;letter-spacing:.03em;text-transform:uppercase}
-label::after{content:" *";visibility:hidden}
-label:has(>input[required])::after{visibility:visible;color:var(--ko);font-weight:700}
+label span::after{content:" *";visibility:hidden}
+label:has(>input[required]) span::after{visibility:visible;color:var(--ko);font-weight:700}
 input,select{padding:8px 10px;border:1.5px solid var(--bord);border-radius:9px;font-size:.9rem;background:#fff;color:var(--texte);max-width:100%;box-sizing:border-box;transition:border-color .15s,box-shadow .15s}
 input:focus,select:focus{outline:none;border-color:var(--bleu);box-shadow:0 0 0 3px rgba(79,70,229,.14)}
 button{padding:8px 16px;border:1px solid transparent;border-radius:9px;background:linear-gradient(135deg,var(--bleu),var(--bleu-2));color:#fff;font-weight:600;font-size:.88rem;cursor:pointer;transition:filter .15s,transform .05s,box-shadow .15s;box-shadow:0 1px 2px rgba(79,70,229,.35)}
@@ -574,12 +574,12 @@ h3.ct{margin:0;font-size:.75rem;color:var(--texte2);text-transform:uppercase;let
 <h2>Échéances mensuelles</h2>
 <div style="margin-bottom:10px">Total mensuel (échéances actives) : <b id="ech_total"></b></div>
 <form onsubmit="addEch(event)">
-<label>Tiers<input id="e_tiers" required placeholder="Bailleur, banque…"></label>
-<label>Description<input id="e_lib" required placeholder="Loyer, crédit auto…"></label>
-<label>Montant (€)<input id="e_montant" required placeholder="-850"></label>
-<label>Jour (1-28, 99=fin)<input id="e_jour" required value="5"></label>
-<label>Catégorie<select id="e_cat"></select></label>
-<label>Type<select id="e_type"></select></label>
+<label><span>Tiers</span><input id="e_tiers" required placeholder="Bailleur, banque…"></label>
+<label><span>Description</span><input id="e_lib" required placeholder="Loyer, crédit auto…"></label>
+<label><span>Montant (€)</span><input id="e_montant" required placeholder="-850"></label>
+<label><span>Jour (1-28, 99=fin)</span><input id="e_jour" required value="5"></label>
+<label><span>Catégorie</span><select id="e_cat"></select></label>
+<label><span>Type</span><select id="e_type"></select></label>
 <button>Ajouter</button>
 </form>
 <p style="font-size:.75rem;color:#888">Les échéances actives sont reportées vers les transactions le 1ᵉʳ jour de chaque mois, un mois après l'autre. Modifier une échéance ne met pas à jour les transactions déjà reportées pour les mois à venir.</p>
@@ -593,14 +593,14 @@ h3.ct{margin:0;font-size:.75rem;color:var(--texte2);text-transform:uppercase;let
 <div>
 <h3 class="ct">🏷️ Catégories</h3>
 <form onsubmit="addCat(event)" style="margin-top:8px">
-<label>Nom catégorie<input id="c_nom" required placeholder="Courses, Loisirs…"></label>
+<label><span>Nom catégorie</span><input id="c_nom" required placeholder="Courses, Loisirs…"></label>
 <button>Ajouter</button></form>
 <div id="catlist" class="ctlist"></div>
 </div>
 <div>
 <h3 class="ct">💳 Types de paiement</h3>
 <form onsubmit="addType(event)" style="margin-top:8px">
-<label>Nouveau type<input id="t_nom" required placeholder="CB, Chèque, PayPal…"></label>
+<label><span>Nouveau type</span><input id="t_nom" required placeholder="CB, Chèque, PayPal…"></label>
 <button>Ajouter</button></form>
 <div id="typelist" class="ctlist"></div>
 </div>
@@ -611,13 +611,13 @@ h3.ct{margin:0;font-size:.75rem;color:var(--texte2);text-transform:uppercase;let
 <section class="cadre">
 <h2>Transactions</h2>
 <form onsubmit="addTx(event)">
-<label>Date<input type="date" id="f_date" required></label>
-<label>Tiers<input id="f_tiers" required placeholder="EDF, Carrefour…"></label>
-<label>Description<input id="f_lib" placeholder="Facture, salaire… (option)"></label>
-<label>Type de paiement<select id="f_type"></select></label>
-<label>Catégorie<select id="f_cat"></select></label>
-<label>Catégorie libre<input id="f_newcat" placeholder="nouvelle cat. (option)"></label>
-<label>Montant (€)<input id="f_montant" required placeholder="-45,20 ou 2300"></label>
+<label><span>Date</span><input type="date" id="f_date" required></label>
+<label><span>Tiers</span><input id="f_tiers" required placeholder="EDF, Carrefour…"></label>
+<label><span>Description</span><input id="f_lib" placeholder="Facture, salaire… (option)"></label>
+<label><span>Type de paiement</span><select id="f_type"></select></label>
+<label><span>Catégorie</span><select id="f_cat"></select></label>
+<label><span>Catégorie libre</span><input id="f_newcat" placeholder="nouvelle cat. (option)"></label>
+<label><span>Montant (€)</span><input id="f_montant" required placeholder="-45,20 ou 2300"></label>
 <button>Ajouter</button>
 </form>
 <div class="filtres" style="margin-top:14px">
