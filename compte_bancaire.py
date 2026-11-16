@@ -3,6 +3,7 @@
 """
 Tenue de compte bancaire — web app locale (aucune dépendance).
 Usage :  python3 compte_bancaire.py  puis ouvrir http://localhost:8000
+         (sous Windows : py compte_bancaire.py ou python compte_bancaire.py)
 Options : python3 compte_bancaire.py [port] [chemin_bdd]
 Arrêt  : Ctrl+C, ou bouton ⏻ Quitter dans l'interface
 Base par défaut : ~/pCloudDrive/compte_bancaire/compte.db (le dossier est
@@ -68,11 +69,26 @@ from datetime import date
 from http.server import HTTPServer, ThreadingHTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qsl
 
+# Sous Windows, la sortie redirigée est en cp1252 : les emoji du journal
+# lèveraient UnicodeEncodeError. On remplace silencieusement les caractères
+# non représentables au lieu de perdre les lignes de log.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(errors="replace")
+    sys.stderr.reconfigure(errors="replace")
+
 try:
     PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
 except ValueError:
     sys.exit(f"✖ Port invalide : {sys.argv[1]!r} (exemples corrects : 8000, 8080)")
-DOSSIER_BDD = os.path.expanduser("~/pCloudDrive/compte_bancaire")
+# Sous Linux/macOS, pCloud Drive est monté dans ~/pCloudDrive ; sous Windows,
+# pCloud crée un dossier « pCloud Drive » dans le profil utilisateur (ou une
+# lettre de lecteur). Le chemin reste surchargeable : variable d'environnement
+# COMPTE_BANCAIRE_DIR, ou 2e argument de la ligne de commande.
+if os.name == "nt":
+    DOSSIER_BDD = os.environ.get("COMPTE_BANCAIRE_DIR") or os.path.expanduser(
+        r"~\pCloud Drive\compte_bancaire")
+else:
+    DOSSIER_BDD = os.path.expanduser("~/pCloudDrive/compte_bancaire")
 DB_PATH = sys.argv[2] if len(sys.argv) > 2 else os.path.join(DOSSIER_BDD, "compte.db")
 FICHIER_LOG = os.path.join(DOSSIER_BDD, "compte_bancaire.log")
 TOKEN = secrets.token_hex(16)   # jeton anti-CSRF pour /api/arret
@@ -791,6 +807,11 @@ load();
 </script></body></html>"""
 
 # ---------------------------------------------------------------- serveur
+class Serveur(ThreadingHTTPServer):
+    # Sous Windows, SO_REUSEADDR autorise le bind sur un port déjà pris :
+    # deux instances pourraient tourner sur la même base. On le désactive.
+    allow_reuse_address = os.name != "nt"
+
 def arret_propre(server):
     """Arrêt complet : shutdown du serveur, sauvegarde de la base, arrêt brutal."""
     try:
@@ -904,10 +925,12 @@ if __name__ == "__main__":
         os.makedirs(os.path.dirname(DB_PATH) or ".", exist_ok=True)
     except OSError as e:
         sys.exit(f"✖ Impossible de créer le dossier de la base ({e}). "
-                 "pCloud Drive est-il bien lancé et monté ?")
+                 + ("pCloud Drive est-il bien lancé et monté ?"
+                    if os.name != "nt" else
+                    "pCloud Drive est-il bien démarré (lecteur pCloud visible dans l'Explorateur) ?"))
     # journal : copie de la sortie console dans le dossier de la base
     try:
-        log = open(FICHIER_LOG, "a", buffering=1)
+        log = open(FICHIER_LOG, "a", encoding="utf-8", buffering=1)
     except OSError as e:
         print(f"⚠ Journal indisponible ({e}) — sortie console uniquement.")
         log = None
@@ -922,7 +945,7 @@ if __name__ == "__main__":
     generer_echeances()
     url = f"http://localhost:{PORT}"
     try:
-        server = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
+        server = Serveur(("127.0.0.1", PORT), Handler)
     except OSError:
         # déjà lancée : on ouvre simplement le navigateur sur l'instance existante
         print("⚠ Déjà lancée — ouverture du navigateur.")
